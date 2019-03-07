@@ -1,0 +1,38 @@
+[include]
+    path = functions
+
+[alias]
+    # master flow
+    create-fb = "!. $PWD/trunk-flow/aliases/scripts/create-fb.sh"
+    finish-fb = "!. $PWD/trunk-flow/aliases/scripts/finish-fb.sh"
+
+    # rc-branch flow
+    list-fb = "!. $PWD/trunk-flow/aliases/scripts/list-fb.sh"
+    create-rc = "!. $PWD/trunk-flow/aliases/scripts/create-rc.sh"
+    create-rc-fix = "!. $PWD/trunk-flow/aliases/scripts/create-rc-fix.sh"
+    finish-rc-fix = "!. $PWD/trunk-flow/aliases/scripts/finish-rc-fix.sh"
+    create-rc-inhibit = "!. $PWD/trunk-flow/aliases/scripts/create-rc-inhibit.sh"
+    finish-rc-inhibit = "!. $PWD/trunk-flow/aliases/scripts/finish_rc_inhibit.sh"
+    release-rc = "!. $PWD/trunk-flow/aliases/scripts/release-rc.sh"
+
+    abort-rc = "!. $PWD/trunk-flow/aliases/scripts/abort_rc.sh"
+
+    create-hotfix = "!. $PWD/trunk-flow/aliases/scripts/create-hotfix.sh"
+    finish-hotfix = "!. $PWD/trunk-flow/aliases/scripts/finish-hotfix.sh"
+
+    release-hc = "!. $PWD/trunk-flow/aliases/scripts/release-hc.sh"
+
+    pull-request = "!. $PWD/trunk-flow/aliases/scripts/pull_request.sh"
+
+
+
+
+
+
+
+
+
+
+
+
+

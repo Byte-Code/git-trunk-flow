@@ -1,0 +1,79 @@
+[alias]
+
+trunk = "!f() { cat $PWD/trunk-flow/VERSION; }; f"
+
+lasttag = "!f() {\
+    git tag -l ${1}-v* --sort=v:refname | tail -1;\
+}; f"
+
+prevtag = "!f() {\
+    git tag -l ${1}-v* --sort=v:refname | tail -2 | head -1;\
+}; f"
+
+nexttag = "!f() {\
+    env=${1};\
+    cur_version=$(git lasttag ${env} | awk -F '-v' '{print $NF}');\
+    next_version=$(($cur_version+1));\
+    next_tag=${env}-v${next_version};\
+    echo ${next_tag};\
+}; f"
+
+tagnext = "!f() {\
+    env=${1};\
+    next_version=$(($(git lasttag ${env} | sed 's/.*-v\\([:digit:]*\\)/\\1/g') + 1));\
+    next_tag=${env}-v${next_version};\
+    git tag ${next_tag} && echo \"Created tag '${next_tag}'.\";\
+}; f"
+
+pushnext = "!f() {\
+    env=${1};\
+    lasttag=$(git lasttag ${env});\
+    git push origin ${lasttag};\
+}; f"
+
+refname = "!f() {\
+    git for-each-ref --format='%(refname:short)' $(git symbolic-ref -q HEAD);\
+}; f"
+
+# Retrieve the upstream name of the provided branch (or of the current if called without argument)
+upstream = "!f() {\
+	BRANCH=$1;\
+	[[ ! ${BRANCH} ]] && BRANCH=HEAD;\
+	git for-each-ref --format='%(upstream:short)' $(git rev-parse --symbolic-full-name ${BRANCH});\
+}; f"
+
+# Output the number of commits ahead of the current branch's upstream
+# If there's not an upstream behaves like no ahead
+ahead = "!f() { \
+    BRANCH=$(git refname); \
+    [[ $1 ]] && BRANCH=$1; \
+    UPSTREAM=$(git upstream $BRANCH); \
+    if [[ $UPSTREAM ]]; then \
+        AHEAD=$(echo $(git cherry $UPSTREAM $BRANCH | wc -l)); \
+        if [[ $AHEAD == "0" ]]; then \
+            echo ""; \
+        else \
+            echo "$AHEAD"; \
+        fi \
+    else \
+        echo ""; \
+    fi \
+}; f"
+
+# Output the number of commits behind of the current branch's upstream
+# If there's not an upstream behaves like no behind
+behind = "!f() { \
+    BRANCH=$(git refname); \
+    [[ $1 ]] && BRANCH=$1; \
+    UPSTREAM=$(git upstream $BRANCH); \
+    if [[ $UPSTREAM ]]; then \
+        BEHIND=$(echo $(git cherry $BRANCH $UPSTREAM | wc -l)); \
+        if [[ $BEHIND == "0" ]]; then \
+            echo ""; \
+        else \
+            echo "$BEHIND"; \
+        fi \
+    else \
+        echo ""; \
+    fi \
+}; f"
