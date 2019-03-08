@@ -187,7 +187,7 @@ check_upstream() {
             DIVERGED_MSG=
             DIVERGED_MSG="${DIVERGED_MSG}Your branch and '$(git upstream)' have diverged,\n\n"
             DIVERGED_MSG="${DIVERGED_MSG}1) if you have just rebased this branch, it's normal\n"
-            DIVERGED_MSG="${DIVERGED_MSG}   (use \"git push -f\" to update the remote branch)\n"
+            DIVERGED_MSG="${DIVERGED_MSG}   (use \"git push -f origin ${TOPIC}\" to update the remote branch)\n"
             DIVERGED_MSG="${DIVERGED_MSG}2) if not in the previous case, someone may have pushed just a moment ago\n"
             DIVERGED_MSG="${DIVERGED_MSG}   (use \"git pull --rebase\" to update your local branch)\n"
             DIVERGED_MSG="${DIVERGED_MSG}   (use \"git push origin ${TOPIC}\" to update the remote branch with your changes)\n\n"
