@@ -1,4 +1,3 @@
-VERSION=v0.1.0
 CUR_VERSION=$(git trunk 2>/dev/null)
 DEST=trunk-flow
 
@@ -14,9 +13,6 @@ install() {
 [include]
     path = "../${DEST}/root"
 EOF)
-
-    echo "${INCLUDE}"
-    exit 0
 
     echo "${INCLUDE}" >> .git/config
     echo "${DEST}/" >> .git/info/exclude
