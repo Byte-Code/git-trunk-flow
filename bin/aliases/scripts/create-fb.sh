@@ -6,22 +6,21 @@ TRUNK=master
 git fetch
 
 usage() {
-    echo "error: git create-fb <docs|chore|test|style|refactor|feat|fix> <TP_ID|aCamelCaseDesc>"
+    echo "error: git create-fb <docs|chore|test|refactor|feature|bugfix>/<TP_ID|desc>"
 }
 
-[ ! ${2} ] && usage && exit 1
-
-FB_NAME=
+FB=
 case "${1}" in
-    docs) FB_NAME="${1}/${2}";;
-    chore) FB_NAME="${1}/${2}";;
-    test) FB_NAME="${1}/${2}";;
-    style) FB_NAME="${1}/${2}";;
-    refactor) FB_NAME="${1}/${2}";;
-    feat) FB_NAME="${1}/${2}";;
-    fix) FB_NAME="${1}/${2}";;
+    docs/*) ;;
+    chore/*) ;;
+    test/*) ;;
+    refactor/*) ;;
+    feature/*) ;;
+    bugfix/*) ;;
     *) usage && exit 1;;
 esac
 
+FB="${1}"
+
 # The --no-track allow us to not set $(git upstream ${TRUNK}) as the remote for this branch
-git checkout --no-track -b ${FB_NAME} $(git upstream ${TRUNK})
+git checkout --no-track -b ${FB} $(git upstream ${TRUNK})

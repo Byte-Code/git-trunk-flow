@@ -4,7 +4,7 @@ TRUNK=master
 
 usage() {
     echo "The current branch doesn't seem to be a valid fb branch.\n"
-    echo "A valid fb branch MUST start with docs/|chore/|test/|style/|refactor/|feat/|fix/"
+    echo "A valid fb branch MUST start with docs/|chore/|test/|refactor/|feature/|bugfix/"
 }
 
 FB=$(git refname)
@@ -12,14 +12,7 @@ case "${FB}" in
     docs/*) ;;
     chore/*) ;;
     test/*) ;;
-    style/*) ;;
     refactor/*) ;;
-    feat/*) ;;
-    #retrocompatibility
-    feature/*) ;;
-    fix/*) ;;
-    #retrocompatibility
-    bugfix/*) ;;
     feature/*) ;;
     bugfix/*) ;;
     *) usage && exit 1;;
