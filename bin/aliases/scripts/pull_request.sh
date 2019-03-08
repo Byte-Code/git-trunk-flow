@@ -48,12 +48,6 @@ get_repo_name() {
     fi
 }
 
-#is_mergeable() {
-#	BASE_BRANCH=$1
-#	COMPARE_BRANCH=$2
-#	echo $(git branch --contains $(git upstream ${BASE_BRANCH}) ${COMPARE_BRANCH})
-#}
-
 NO_MERGEABLE_MSG=
 NO_MERGEABLE_MSG="${NO_MERGEABLE_MSG}Cannot create a pull request for a branch not mergeable with '$(git upstream ${BASE_BRANCH})'.\n\n"
 NO_MERGEABLE_MSG="${NO_MERGEABLE_MSG} (use \"git fetch -tp && git rebase $(git upstream ${BASE_BRANCH}))\" to update your local branch)"
