@@ -35,9 +35,9 @@ FIX=$(git refname)
 
 case "${FIX_TYPE}" in
     hc-fix) [[ ${FIX} != hotfix* ]] && echo "The current branch doesn't seem to be an 'hotfix' branch" && exit 1;;
-    rc-fix) [[ ${FIX} != *@* ]] && echo "The current branch doesn't seem to be a 'rc-fix' branch" && exit 1;;
 #    hc-inhibit) ;;
-#    rc-inhibit) ;;
+    rc-fix) [[ ${FIX} != *@* ]] && echo "The current branch doesn't seem to be a 'rc-fix' branch" && exit 1;;
+    rc-inhibit) [[ ${FIX} != *#* ]] && echo "The current branch doesn't seem to be a 'rc-inhibit' branch" && exit 1;;
 esac
 
 case "${FIX_TYPE}" in
@@ -45,8 +45,12 @@ case "${FIX_TYPE}" in
         LHB=$(get_last_hc_branch prod)
         LRB=$(get_last_rc_branch prod)
         set_TARGET ${LHB} ;;
-    rc-fix)
+    rc-fix|rc-inhibit)
+        #TODO Test if is sufficient only the next line or should we consider to pass
+        #TODO prod to get_last_rc_branch() and exit if ! ${LRB}
         LRB=$(get_last_rc_branch)
+#        LRB=$(get_last_rc_branch prod)
+#        [ ! ${LRB} ] && echo "There is no rc-branch ongoing!!!" && exit 1
         set_TARGET ${LRB} ;;
 esac
 
@@ -75,8 +79,12 @@ if [ ${LHB} ] && [ ${TARGET} == ${LHB} ]; then
     merge_to_target ${LHB} ${FIX} ${MERGE_BASE} ${FIX}
 elif [ ${LRB} ] && [ ${TARGET} == ${LRB} ]; then
     echo "Trying to create a pull request in '${LRB}'"
-    MERGE_BASE=$(git merge-base ${FIX} ${LRB})
-    merge_to_target ${LRB} ${FIX} ${MERGE_BASE} ${FIX}
+    if [ ${FIX_TYPE} == "rc-inhibit" ]; then
+        git pull-request ${LRB} ${FIX}
+    else
+        MERGE_BASE=$(git merge-base ${FIX} ${LRB})
+        merge_to_target ${LRB} ${FIX} ${MERGE_BASE} ${FIX}
+    fi
 elif [ ${TARGET} == ${TRUNK} ]; then
     echo "Trying to create a pull request in '${TRUNK}'"
 	MERGE_BASE=$(get_notes ${UPSTREAM_OBJECT})

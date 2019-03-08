@@ -12,7 +12,8 @@
     create-rc-fix = "!. $PWD/trunk-flow/aliases/scripts/create-rc-fix.sh"
     finish-rc-fix = "!. $PWD/trunk-flow/aliases/scripts/finish-rc-fix.sh"
     create-rc-inhibit = "!. $PWD/trunk-flow/aliases/scripts/create-rc-inhibit.sh"
-    finish-rc-inhibit = "!. $PWD/trunk-flow/aliases/scripts/finish_rc_inhibit.sh"
+    finish-rc-inhibit = "!. $PWD/trunk-flow/aliases/scripts/finish-rc-inhibit.sh"
+
     release-rc = "!. $PWD/trunk-flow/aliases/scripts/release-rc.sh"
 
     abort-rc = "!. $PWD/trunk-flow/aliases/scripts/abort_rc.sh"
