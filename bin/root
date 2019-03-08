@@ -16,7 +16,7 @@
 
     release-rc = "!. $PWD/trunk-flow/aliases/scripts/release-rc.sh"
 
-    abort-rc = "!. $PWD/trunk-flow/aliases/scripts/abort_rc.sh"
+#    abort-rc = "!. $PWD/trunk-flow/aliases/scripts/abort_rc.sh"
 
     create-hotfix = "!. $PWD/trunk-flow/aliases/scripts/create-hotfix.sh"
     finish-hotfix = "!. $PWD/trunk-flow/aliases/scripts/finish-hotfix.sh"
