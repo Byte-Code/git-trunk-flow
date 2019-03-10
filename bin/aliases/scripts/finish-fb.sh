@@ -1,10 +1,17 @@
 . $PWD/trunk-flow/aliases/scripts/utils.sh
 
-TRUNK=master
-
 usage() {
     echo "The current branch doesn't seem to be a valid fb branch.\n"
     echo "A valid fb branch MUST start with docs/|chore/|test/|refactor/|feature/|bugfix/"
+}
+
+set_TARGET() {
+    UPSTREAM_NOTES=$(get_notes $(git upstream))
+    if [ ! ${UPSTREAM_NOTES} ]; then
+        TARGET=${TRUNK}
+    else
+        [ ${UPSTREAM_NOTES} == finish ] && TARGET=finish
+    fi
 }
 
 FB=$(git refname)
@@ -18,8 +25,18 @@ case "${FB}" in
     *) usage && exit 1;;
 esac
 
-git fetch
+TRUNK=master
+fetch_all
+set_TARGET
+check_upstream ${FB}
 
-check_upstream
+UPSTREAM_OBJECT=$(git rev-parse $(git upstream ${FB}))
 
-git pull-request ${TRUNK}
+if [ ${TRUNK} == ${TARGET} ]; then
+    git pull-request ${TRUNK} ${FB} & PULL_REQUEST_PID=$!
+    wait ${PULL_REQUEST_PID} \
+        && overwrite_and_push_notes finish ${UPSTREAM_OBJECT} \
+        || exit 1
+elif [ ${TARGET} == finish ]; then
+    handle_finish ${TRUNK} ${FB}
+fi

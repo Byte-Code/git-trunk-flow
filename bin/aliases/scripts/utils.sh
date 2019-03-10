@@ -92,7 +92,7 @@ foo() {
 
 # git notes START
 fetch_notes() {
-    git fetch origin refs/notes/commits:refs/notes/commits
+    git fetch origin refs/notes/commits:refs/notes/commits 2>/dev/null
 }
 
 push_notes() {
@@ -213,5 +213,25 @@ check_upstream() {
         NO_UPSTREAM_MSG="${NO_UPSTREAM_MSG} (use \"git push --set-upstream origin ${TOPIC})\n\n"
         NO_UPSTREAM_MSG="${NO_UPSTREAM_MSG}When ready, re-run this command"
         [[ ! $(git upstream ${TOPIC}) ]] && echo "${NO_UPSTREAM_MSG}" && exit 1
+    fi
+}
+
+handle_finish() {
+    TARGET=$1
+    TOPIC=$2
+    if [ $(git branch --list --remote --contains $(git rev-parse HEAD) $(git upstream ${TARGET})) ]; then
+        echo "'${TOPIC}' has been merged into '${TARGET}'"
+        echo "You have a chance to do some cleaning."
+        echo "Do you want to delete this branch and its upstream? "
+        read -p "y|n): " ANSWER
+        case "${ANSWER}" in
+            n|N) exit 0 ;;
+            y|Y) git checkout ${TARGET}
+                 git pull origin ${TARGET}
+                 git branch -D ${TOPIC}
+                 git push origin --delete --no-verify ${TOPIC} ;;
+        esac
+    else
+        echo "It seems that your pull-request to '${TARGET}' has not yet been merged"
     fi
 }
