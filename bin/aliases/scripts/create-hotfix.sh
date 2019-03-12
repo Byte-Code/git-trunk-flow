@@ -6,7 +6,7 @@ PRT_PREFIX=prod
 LHB=$(get_last_hc_branch ${PRT_PREFIX} --force)
 
 usage() {
-    echo "error: git create-hotfix <TP_ID|aCamelCaseDesc>"
+    echo "error: git create-hotfix <TP_ID|desc>"
 }
 
 HF_NAME=$1
@@ -22,6 +22,7 @@ create_hotfix_branch() {
 }
 
 REMOTE_LHB=$(get_remote ${LHB})
+
 if [ ! ${REMOTE_LHB} ]; then
     git branch ${LHB} ${LPT}
     git push --no-verify --set-upstream origin ${LHB}

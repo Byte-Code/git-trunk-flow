@@ -1,7 +1,7 @@
 get_remote() {
     BRANCH=$1
     [ ! ${BRANCH} ] && echo "You must provide the branch to check the remote for" && exit 1
-    echo $(git for-each-ref --format="%(refname:lstrip=2)" "refs/remotes/*/${BRANCH}")
+    echo "$(git for-each-ref --format="%(refname:lstrip=2)" "refs/remotes/*/${BRANCH}")"
 }
 
 create_branch_from_tag() {
@@ -33,10 +33,22 @@ get_last_rc_branch() {
 
     if [ ${PRT_PREFIX} ]; then
         # Return the LRB only if not already released
-        [ $(git cherry $(git lasttag ${PRT_PREFIX}) $(git upstream ${LRB})) ] && echo "${LRB}"
+        [ "$(git cherry $(git lasttag ${PRT_PREFIX}) $(get_remote ${LRB}))" ] && echo "${LRB}"
     else
         # Just create the rc-branch name starting from last PRT_PREFIX's version
         echo "${LRB}"
+    fi
+}
+
+# Check that the last commit of a branch is contained into another
+# contained_into <INTO> [SUBJECT]
+# If not provided, SUBJECT default to the current HEAD
+contained_into() {
+    INTO=$1
+    if [ ${INTO} ]; then
+        SUBJECT=$2
+        [ ! ${SUBJECT} ] && SUBJECT=$(git rev-parse HEAD)
+        [ "$(git branch -r --contains ${SUBJECT} ${INTO})" ] && echo "${INTO}"
     fi
 }
 
@@ -52,42 +64,12 @@ get_last_hc_branch() {
         # Just create the hc-branch name starting from last PRT_PREFIX's version
         echo ${LHB}
     else
-        if [ $(git ls-remote --heads origin ${LHB}) ]; then
+        # TODO maybe this can be replaced with get_remote()???
+#        if [ $(git ls-remote --heads origin ${LHB}) ]; then
+        if [ "$(get_remote ${LHB})" ]; then
             echo ${LHB}
         fi
     fi
-}
-
-#get_next_hc_branch() {
-#    PRT_PREFIX=$1
-#    HCT_PREFIX=hc
-#    LPT=$(git lasttag ${PRT_PREFIX})
-#    LHB=$(create_branch_from_tag ${LPT} hc)
-#
-#    echo ${LHB}
-#}
-#
-#get_prev_hc_branch() {
-#    PRT_PREFIX=$1
-#    HCT_PREFIX=hc
-#    LPT=$(git lasttag ${PRT_PREFIX})
-#    LHB=$(create_branch_from_tag ${LPT} hc)
-#
-#    echo ${LHB}
-#}
-
-sleep_n() {
-    [ ${1} ] && N=${1} || N=1
-    sleep ${N}
-    exit 1
-}
-
-sub_foo(){
-    echo "Hello $1 $2"
-}
-
-foo() {
-    sub_foo "$@"
 }
 
 # git notes START
@@ -136,21 +118,6 @@ format_behind_msg() {
     BEHIND_MSG="${BEHIND_MSG}  (use \"git pull --rebase\")\n"
     echo "${BEHIND_MSG}"
 }
-
-#create_branch_from_tag() {
-#    TAG=$1
-#    # If TAG_VERSION provided, this version will be used.
-#    # In this case you could provide also only the TAG prefix (without the -v* part)
-#    TAG_VERSION=$2
-#
-#    [ ! ${TAG} ] && echo "You must provide the tag from which create the branch" && exit 1
-#
-#    TAG_PREFIX=$(cut -d '-' -f1 <<< "${TAG}")
-#    [ ! ${TAG_VERSION} ] && TAG_VERSION=$(cut -d '-' -f2 <<< "${TAG}")
-#    BRANCH_PREFIX="${TAG_PREFIX}-branch"
-#
-#    echo "${BRANCH_PREFIX}-${TAG_VERSION}"
-#}
 
 get_features_inhibit() {
     FEATURES=${1}
@@ -219,11 +186,12 @@ check_upstream() {
 handle_finish() {
     TARGET=$1
     TOPIC=$2
-    if [ $(git branch --list --remote --contains $(git rev-parse HEAD) $(git upstream ${TARGET})) ]; then
-        echo "'${TOPIC}' has been merged into '${TARGET}'"
-        echo "You have a chance to do some cleaning."
-        echo "Do you want to delete this branch and its upstream? "
-        read -p "y|n): " ANSWER
+#    if [ $(git branch --list --remote --contains $(git rev-parse HEAD) $(git upstream ${TARGET})) ]; then
+    if [ $(git branch --list --remote --contains $(git rev-parse HEAD) $(get_remote ${TARGET})) ]; then
+        echo "Good news :) '${TOPIC}' has been merged into '${TARGET}'"
+        echo "Since now '${TOPIC}' branch is useless, you have a chance to do some cleaning."
+        echo "Do you want to delete this branch and its upstream?"
+        read -p "y|n) " ANSWER
         case "${ANSWER}" in
             n|N) exit 0 ;;
             y|Y) git checkout ${TARGET}

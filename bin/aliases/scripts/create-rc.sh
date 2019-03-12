@@ -14,7 +14,7 @@ check_upstream
 
 LRB=$(get_last_rc_branch)
 
-if [[ $(git cherry $(git lasttag ${PRT_PREFIX}) $(git upstream ${LRB})) ]]; then
+if [[ $(git cherry $(git lasttag ${PRT_PREFIX}) $(get_remote ${LRB})) ]]; then
     # Check that the last rc-branch has some commits not yet released on the
     # last production tag. If that is the case...
     echo "There is already \"${LRB}\" ongoing"
@@ -22,7 +22,7 @@ else
     # If last rc-branch is completely contained into last production tag
     # check that there are some commits to release and then create
     # a new rc-branch
-    if [[ $(git cherry $(git lasttag ${PRT_PREFIX}) $(git upstream ${TRUNK})) ]]; then
+    if [ "$(git cherry $(git lasttag ${PRT_PREFIX}) $(get_remote ${TRUNK}))" ]; then
         fetch_notes
         FEATURE_INHIBIT=$(get_features_inhibit $(git list-fb script))
         NRT=$(git nexttag ${RCT_PREFIX})

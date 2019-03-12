@@ -1,3 +1,7 @@
+. $PWD/trunk-flow/aliases/scripts/utils.sh
+
+fetch_all
+
 case "${1}" in
     create) CREATE=true;;
     script) SCRIPT=true;;
@@ -35,7 +39,7 @@ if [ ${CREATE} ]; then
     echo "${FEATURES}"
 else
     # We need to retrieve already created FEATURES list
-    FEATURES=$(git notes show $(git lasttag ${RCT_PREFIX}))
+    FEATURES=$(get_notes $(git lasttag ${RCT_PREFIX}))
     if [ ${SCRIPT} ]; then
         echo "${FEATURES}"
     elif [ ${HUMAN} ]; then
