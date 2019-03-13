@@ -17,8 +17,9 @@ LPT=$(git lasttag ${PRT_PREFIX})
 
 create_hotfix_branch() {
     HF_NAME=$1
+    [[ ${HF_NAME} != hotfix/* ]] && HF_NAME="hotfix/${HF_NAME}"
     START_POINT=$2
-    git checkout --no-track -b "hotfix/${HF_NAME}" ${START_POINT}
+    git checkout --no-track -b "${HF_NAME}" ${START_POINT}
 }
 
 REMOTE_LHB=$(get_remote ${LHB})
