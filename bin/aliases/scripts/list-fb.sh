@@ -5,18 +5,17 @@ fetch_all
 case "${1}" in
     create) CREATE=true;;
     script) SCRIPT=true;;
+    preview) PREVIEW=true;;
     *) HUMAN=true;;
 esac
 
 RCT_PREFIX=rc
-if [ ${CREATE} ]; then
-    # This script branch will be called always from create-rc.sh script so is not necessary to fetch.
-    PRT_PREFIX=prod
-    TRUNK=master
+PRT_PREFIX=prod
+TRUNK=master
 
+create() {
+    FEATURES=$1
     LRT=$(git lasttag ${RCT_PREFIX})
-
-    FEATURES=$2
     # Retrieve messages of new testable fb
     # Filtering out hotfixes (grep -v 'hotfix') and rc fixes (grep -v '@')
     MESSAGES=$(git log ${LRT}..$(git upstream ${TRUNK}) --first-parent --oneline --pretty=format:'%s' | grep -v 'hotfix' | grep -v '@')
@@ -37,17 +36,31 @@ if [ ${CREATE} ]; then
         fi
     done
     echo "${FEATURES}"
+}
+
+output_human() {
+    FEATURES=$1
+    IFS=','
+    for FB in ${FEATURES}
+    do
+        echo "${FB}"
+    done
+}
+
+if [ ${CREATE} ]; then
+    # When called by create-rc.sh script the second argument may contains a list
+    # on inhibited features that actually haven't been tested
+    create "${2}"
+elif [ ${PREVIEW} ]; then
+    FEATURE_INHIBIT=$(get_features_inhibit $(git list-fb script))
+    output_human $(create ${FEATURE_INHIBIT})
 else
-    # We need to retrieve already created FEATURES list
+    # We retrieve the already created FEATURES list
     FEATURES=$(get_notes $(git lasttag ${RCT_PREFIX}))
     if [ ${SCRIPT} ]; then
         echo "${FEATURES}"
     elif [ ${HUMAN} ]; then
-        IFS=','
-        for FB in ${FEATURES}
-        do
-            echo "${FB}"
-        done
+        output_human ${FEATURES}
     fi
 fi
 
