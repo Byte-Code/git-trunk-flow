@@ -163,21 +163,21 @@ check_upstream() {
         else
             BEHIND_MSG=
             BEHIND_MSG="${BEHIND_MSG}Your branch is behind '$(git upstream)'\n"
-            BEHIND_MSG="${BEHIND_MSG} (use \"git pull\" to update your local branch)\n\n"
+            BEHIND_MSG="${BEHIND_MSG}  (use \"git pull\" to update your local branch)\n\n"
             BEHIND_MSG="${BEHIND_MSG}When ready, re-run this command"
             echo "${BEHIND_MSG}" && exit 1
         fi
     elif [[ $(git ahead) ]]; then
         AHEAD_MSG=
         AHEAD_MSG="${AHEAD_MSG}Your branch is ahead of '$(git upstream)'\n"
-        AHEAD_MSG="${AHEAD_MSG} (use \"git push origin ${TOPIC}\" to update the remote branch with your changes)\n\n"
+        AHEAD_MSG="${AHEAD_MSG}  (use \"git push origin ${TOPIC}\" to update the remote branch with your changes)\n\n"
         AHEAD_MSG="${AHEAD_MSG}When ready, re-run this command"
         echo "${AHEAD_MSG}" && exit 1
     else
         NO_UPSTREAM_MSG=
         NO_UPSTREAM_MSG="${NO_UPSTREAM_MSG}fatal: The current branch '${TOPIC}' has no upstream branch.\n\n"
         NO_UPSTREAM_MSG="${NO_UPSTREAM_MSG}To push the current branch and set the remote as upstream\n\n"
-        NO_UPSTREAM_MSG="${NO_UPSTREAM_MSG} (use \"git push --set-upstream origin ${TOPIC})\n\n"
+        NO_UPSTREAM_MSG="${NO_UPSTREAM_MSG}  (use \"git push --set-upstream origin ${TOPIC})\n\n"
         NO_UPSTREAM_MSG="${NO_UPSTREAM_MSG}When ready, re-run this command"
         [[ ! $(git upstream ${TOPIC}) ]] && echo "${NO_UPSTREAM_MSG}" && exit 1
     fi

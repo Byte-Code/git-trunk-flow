@@ -29,9 +29,7 @@ LRB=$(get_last_rc_branch)
 LPT=$(git lasttag ${PRT_PREFIX})
 
 if [ ! "$(git cherry ${LPT} $(get_remote ${LRB}))" ]; then
-    echo "The last rc-branch is '${LRB}' and seems to point to the same commit"
-    echo "of '${LPT}' which is the last prod tag."
-    echo "Probably you forgot to create the rc-branch with \"git create-rc\" command"
+    echo "It seems that there is not an rc-branch \"ongoing\""
 else
     if [[ ! $(git list-fb script) == *"${FB}"* ]]; then
         echo "warning: ${FB} doesn't seem to have been released in ${LRB}"

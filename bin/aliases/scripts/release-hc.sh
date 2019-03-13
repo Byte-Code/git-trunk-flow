@@ -1,2 +1,2 @@
 . $PWD/trunk-flow/aliases/scripts/utils.sh
-. $PWD/trunk-flow/aliases/scripts/release.sh "prod" "$(get_last_hc_branch prod)"
+. $PWD/trunk-flow/aliases/scripts/release-prod.sh "prod" "$(get_last_hc_branch prod)"

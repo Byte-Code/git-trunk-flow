@@ -2,6 +2,9 @@
     path = functions
 
 [alias]
+    # cross
+    release = "!. $PWD/trunk-flow/aliases/scripts/release.sh"
+
     # master flow
     create-fb = "!. $PWD/trunk-flow/aliases/scripts/create-fb.sh"
     finish-fb = "!. $PWD/trunk-flow/aliases/scripts/finish-fb.sh"
