@@ -1,121 +1,252 @@
-MAIN RULES:
+PREMESSA:
 
-master, rc-branch-v*, hc-branch-v*
-- sono branch che vanno sempre in parallelo
+**master**, **rc-branch-v\***, **hc-branch-v\***
+- Sono branch che vanno sempre in PARALLELO
 - NON devono MAI essere mergiati da nessuna parte!!!
 
-master:
-	Branch dal quale vengono creati i docs/chore/test/refactor/feat/fix branch
-	di seguito noti anche come fb-branch
+Tutti gli alias finish-* hanno al loro interno la logica che serve per essere "trapiantati"
+e mergiati (tramite pull request) sul prossimo branch di destinazione. Questo tipo
+di alias va eseguito sul branch in oggetto un numero di volte variabile (a seconda del tipo e
+della situazione in corso) e danno le informazioni necessarie per proseguire con lo step successivo.
+E' vietato eseguire rebase a meno che non sia espressamente indicato.
 
-	I feat sono i vecchi feature, mentre i fix sono i vecchi bugfix
-	Su target process mappiamo i feat con le User Story, mentre i fix con i Bug
-	La maggior parte dei branch creati da master saranno di questi due tipi, ma per completezza
-	qui un elenco esaustivo di cosa ogni tipo di branch dovrebbe contenere:
+Ogni comando di tipo finish-* offre quando si e' arrivati allo step finale la
+possibilita' di cancellare il branch ormai inutile per mantenere il repo
+in ordine. Da github c'e' sempre la possibilita' di ricreare il branch cancellato qualora
+ce ne fosse bisogno.
 
-	NO production CODE or BEHAVIOUR change
-	docs: (changes to the documentation)
-	chore: (Updating webpack config, fine tuning uglifying, etc.)
-	test: (adding missing tests, refactoring existing tests;)
-	NO production BEHAVIOUR change
-	refactor:
-	production CODE and BEHAVIOUR change
-	feat: (NEW feature for the USER, NOT a new feature for a dev SCRIPT)
-	fix: (bug fix for the USER, NOT a fix to a dev SCRIPT)
+Assieme alla suite di alias specifici per ogni branch, esiste anche un alias
+che serve semplicemente a pushare su di un branch remoto specificato, la HEAD del branch
+corrente:
 
-	Ogni docs/chore/test/style/refactor/feat/fix quando completato verra' portato su master
-	tramite pull request.
+**git release**
 
-	Git alias coinvolti:
-
-	git create-fb:
-		usage:
-		git create-fb <docs|chore|test|style|refactor|feat|fix> <TP_ID|aCamelCasedDescription>
-		description:
-		Serve per creare un nuovo fb-branch
-
-	git finish-fb:
-		usage:
-		git finish-fb (lanciato all'interno del fb-branch)
-		description:
-		Serve per create la pull-request su master del branch in questione.
-		N.B. Se il branch corrente non e' allineato con origin/master la pull-request fallira'
-
-	git create-rc:
-		usage:
-		git create-rc
-		description:
-		Serve per creare un nuovo release candidate branch nel formato: rc-branch-v*
-
-rc-branch-v*:
-	Branch che viene creato quando si decide di portare in produzione le nuove feature sviluppate su master.
-
-	E' assolutamente vietato effettuare NUOVI sviluppi in questo tipo di branch.
-	Gli sviluppi nuovi vanno fatti sempre su master!!!
-
-	Questo branch viene rilasciato in ambiente di QA, dove verranno svolti i test di integrazione per validare gli
-	sviluppi ed eventualmente effettuare bugfix o qualora fosse strettamente necessario, inibire alcune funzionalita'
-	per il rilascio corrente.
-
-	Da questo branch possono essere creati due tipi di branch:
-	1) rc-fix branch
-	2) rc-inhibit branch
-
-	1) Sono semplicemente branch nei quali vengono effettuati gli sviluppi per risolvere dei bug che si rendono
-	noti solo quando si rilascia in QA o che semplicemente non sono stati notati prima in DEV. La necessita'
-	di avere un flusso dedicato per questotipo di bugfix e' che e' necessario avere un modo per poter riportare
-	tali modifiche anche sul branch master. Dal momento che sono assolutamente vietati i merge da rc-branch a master
-	sono stati previsti due alias rispettivamente per iniziare e concludere lo sviluppo di una rc-fix.
-
-	2)
-
-	Gli alias coinvolti:
-
-	git create-rc-fix
-	git create-rc-inhibit
-	git release-rc:
-		usage:
-		git release-rc (lanciato all'interno dell'ultimo rc-branch)
-		description:
-		Inneschera' un rilascio in produzione pushando sul branch dedicato (release-prod) ed inoltre
-		creera' un nuovo tag di produzione del tipo prod-v*
-
-LEGENDA:
-
-rc-branch: release candidate branch
-hc-branch: hotfix candidate branch
-
-fb: feature feature/bugfix
-hb: feature hotfix
-
-pr: pull request
+    usage:
+    git release <target_branch>
+    description:
+    Il target branch deve esistere gia' in remoto e verra' sovrascritto dal branch
+    nel quale viene lanciato il comando
 
 
+# master (aka trunk)
 
-- Le hotfix sono bugfix da fare il prima possibile in produzione perche' pregiudicano GRAVEMENTE il corretto
-  funzionamento dell'applicativo
+Branch dal quale vengono creati i docs/chore/test/refactor/feature/bugfix branch
+di seguito noti anche come **fb-branch**
 
-- I due branch "eterni" sono master e prod.
-  - master: accoglie le fb (tramite pr), testate sui propri ambienti di sviluppo e potenzialmente rilasciabili in produzione
-  - prod: accoglie le hf (tramite pr), testate su preprod e immediatamente rilasciabili in produzione
+Su target process mappiamo i feature con le User Story, mentre i bugfix con i Bug.
+La maggior parte dei branch creati da master saranno di questi due tipi ma per completezza
+qui un elenco esaustivo di cosa ogni tipo di branch dovrebbe contenere e cosa va a toccare,
+se non altro per filtrare le cose che non hanno bisogno di test manuali:
 
-- Ogni sviluppo prima di essere portato su master (tramite pr) va testato prima sul proprio ambiente di sviluppo (dev-prodotto etc.).
-  Fanno eccezione gli sviluppi, relativi a bugfix di fb in testing o inibizioni di fb, fatti dopo aver staccato un rcb.
-  In questo ultimo caso la pr va fatta sul rcb e IMMEDIATAMENTE dopo va fatta su master ed accettata automaticamente al netto di conflitti.
+**NO production CODE or BEHAVIOUR change**
 
-- Un rcb nasce sempre e solo da master
-- Dopo aver creato un rcb va manualmente settata la regola di protezione sul branch (da github.com)
-- Puo' esistere un solo rcb alla volta
-- Il rcb va testato su QA, se necessario puo' essere fatto un ulteriore test su PREPROD
-- Il rcb deve avere vita breve
+    docs: (changes to the documentation, adding docs to a function/component, etc.)
+    chore: (updating webpack config, fine tuning uglifying, etc.)
+    test: (adding missing tests, refactoring existing tests)
 
-- Le hf hanno sempre priorita' rispetto alle bugfix sul rcb
-- Le hf vanno sempre testate su preprod
+**production CODE WITHOUT BEHAVIOUR change**
 
+    refactor: (split a complex component into many smaller without changing the whole behaviour)
 
+**production CODE and BEHAVIOUR change**
 
-TODO:
-- Prevedere un flag per eliminare i branch quando non servono piu'
+    feature: (NEW feature for the USER, NOT a new feature for a dev SCRIPT)
+    bugfix: (bug fix for the USER, NOT a fix to a dev SCRIPT)
 
 
-feature/26771
+Ogni fb-branch quando completato verra' portato su master tramite pull request innescata
+dal comando git finish-fb
+
+Git alias coinvolti:
+
+**git create-fb**
+
+    usage:
+    git create-fb <docs|chore|test|refactor|feature|bugfix>/<TP_ID|desc>
+    description:
+    Serve per creare un nuovo fb-branch
+    N.B. Il branch verra' creato sempre a partire dall'ultimo commit di origin/master, a prescindere 
+    dal branch in cui viene eseguito l'alias
+
+**git finish-fb**
+
+    usage:
+    git finish-fb (lanciato all'interno del fb-branch)
+    description:
+    Serve per creare la pull-request su master del branch in questione.
+
+**git create-rc**
+
+    usage:
+    git create-rc
+    description:
+    Serve per creare un nuovo release candidate branch nel formato: rc-branch-v*
+    N.B. E' necessario utilizzare il comando: git release release-qa, per allineare
+    l'ambiente di QA con l'appena creato rc-branch
+
+**git list-fb**
+
+    usage:
+    git list-fb [preview]
+    description:
+    - Se chiamato con l'argomento preview, mostra l'elenco dei fb-branch che verrebbero inseriti
+    nel nuovo rc-branch qualora creato
+    - Se chiamato senza argomenti mostra l'elenco dei fb-branch collegati all'ultimo rc tag
+
+# rc-branch-v\*
+
+Branch che viene creato quando si decide di portare in produzione i nuovi fb-branch mergiati su master.
+
+E' assolutamente vietato effettuare NUOVI sviluppi in questo tipo di branch.
+Gli sviluppi **nuovi** vanno fatti sempre su **master**!!!
+
+Questo branch viene rilasciato in ambiente di QA, dove verranno svolti i test di integrazione per validare gli
+sviluppi ed eventualmente effettuare bugfix o, qualora fosse strettamente necessario,
+inibire alcune funzionalita' per il rilascio corrente.
+
+Da questo branch possono essere creati due tipi di branch:
+1) **rc-fix** branch
+2) **rc-inhibit** branch
+
+1\) Sono semplicemente branch nei quali vengono effettuati gli sviluppi per risolvere dei bug che si rendono
+noti solo quando si rilascia l'**rc-branch** in QA. La necessita' di avere un flusso dedicato per questo tipo di bugfix risiede nel fatto che serve un modo per poter riportare
+tali modifiche anche sul branch master. Dal momento che sono vietati i merge da rc-branch a master
+sono stati previsti due alias rispettivamente per iniziare e concludere lo sviluppo di un rc-fix.
+
+2\) Sono branch dove vengono "sviluppati" dei workaround temporanei per nascondere/inibire qualcosa nel **rc-branch** corrente
+in modo da non rilascirli in produzione. A differenza dei rc-fix branch al punto 1, questi non devono essere riportati su master perche' l'inibizione viene fatta a livello
+di rc-branch corrente e si spera che i problemi che hanno impedito la messa in produzione in questo rc-branch
+siano risolti al rilascio successivo.
+
+Git alias coinvolti:
+
+Per i branch di tipo rc-fix:
+
+**git create-rc-fix**:
+
+    usage:
+    git create-rc-fix <fb-branch|TP>
+    description:
+    E' il comando che permette di creare un nuovo rc-fix branch
+
+**git finish-rc-fix**:
+
+    usage:
+    git finish-rc-fix
+    description:
+    Bisognera' eseguire questo comando DUE volte:
+    1) Incorporare la fix sul rc-branch corrente (pull-request su rc-branch)
+    2) Incorporare la fix su master immediatamente dopo che la pull-request al punto 1
+    e' stata approvata e mergiata.
+    N.B. Il comando va lanciato all'interno del rc-fix branch
+
+Per i branch di tipo rc-inhibit:
+
+**git create-rc-inhibit**
+
+    usage:
+    git create-rc-inhibit <fb-branch|TP>
+    description:
+    E' il comando che permette di creare un nuovo rc-inhibit branch
+
+**git finish-rc-inhibit**
+
+    usage:
+    git finish-rc-inhibit
+    description:
+    Bisognera' eseguire questo comando UNA volta:
+    1) Incorporare la fix sul rc-branch corrente (pull-request su rc-branch)
+    N.B. Il comando va lanciato all'interno del rc-inhibit branch
+
+Una volta che tutte le nuove feature ed i bugfix portati in QA, sono stati testati e laddove necessario effettuate le opportune fix,
+il rc-branch e' pronto per poter essere portato in produzione.
+A tal proposito esiste un alias dedicato:
+
+## git release-rc
+
+    usage:
+    git release-rc (lanciato all'interno dell'ultimo rc-branch)
+    description:
+    Inneschera' un rilascio in produzione pushando sul branch dedicato (release-prod) ed inoltre
+    creera' un nuovo tag di produzione del tipo prod-v(CURRENT N+1)
+
+# hc-branch-v\*:
+
+Branch che viene automaticamente creato quando si rende necessario effettuare una hotfix.
+
+Esso serve come base di appoggio per i branch di hotfix e ci da la possibilita' di effettuare
+piu' di una hotfix in sequenza, effettuando un solo rilascio.
+
+Git alias coinvolti:
+
+**git create-hotfix**
+
+    usage:
+    git create-hotfix <TP|desc>
+    description:
+    La prima volta che viene chiamato crea anche l'hc-branch di "appoggio" che viene "staccato"
+    a partire dall'ultimo tag di prod.
+    Le volte successive solo l'hotfix branch verra' creato e verra' staccato dal remote
+    dell'ultimo hc-branch
+
+**git finish-hotfix**:
+
+    usage:
+    git finish-hotfix
+    description:
+    Bisognera' eseguire questo comando DUE o TRE volte dipendentemente dall'esistenza
+    o meno di un rc-branch in corso. La prima esecuzione e' identica in entrambi i casi
+    1) Incorporare la hotfix sul hc-branch corrente (pull-request su hc-branch)
+
+    Nel caso, piu' semplice, di non esistenza di un rc-branch in corso
+    2a) Incorporare la hotfix su master immediatamente dopo che la pull-request al punto 1
+    e' stata approvata e mergiata.
+
+    Nel caso, piu' complesso, di esistenza di un rc-branch
+    2b) Incorporare la hotfix su rc-branch immediatamente dopo che la pull-request al punto 1
+    e' stata approvata e mergiata.
+    3) Incorporare la hotfix su master immediatamente dopo che la pull-request al punto 2a
+    e' stata approvata e mergiata.
+
+    N.B. Il comando va lanciato all'interno dell'hotfix branch
+
+## git release-hc
+
+    usage:
+    git release-hc (lanciato all'interno dell'ultimo hc-branch)
+    description:
+    Cosi' come per l'rc-branch anche l'hc-branch ha un comando dedicato per innescare un rilascio
+    in produzione sul branch dedicato. Anche in questo caso verra' creato un nuovo tag di produzione.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
