@@ -9,8 +9,8 @@ set_TARGET() {
     FIX_ORIGIN=$(get_remote ${FIX})
     FIRST_TARGET=${1}
     SECOND_TARGET=${2}
-    FIRST_TARGET_ORIGIN=$(get_remote ${FIRST_TARGET})
-    SECOND_TARGET_ORIGIN=$(get_remote ${SECOND_TARGET})
+    [ ${FIRST_TARGET} ] && FIRST_TARGET_ORIGIN=$(get_remote ${FIRST_TARGET})
+    [ ${SECOND_TARGET} ] && SECOND_TARGET_ORIGIN=$(get_remote ${SECOND_TARGET})
     if [ "$(git rev-parse HEAD)" == "$(git rev-parse ${FIRST_TARGET_ORIGIN})" ]; then
         echo "error: The current branch '$(git refname)' doesn't have commits yet" && exit 1
     else
@@ -77,11 +77,10 @@ case "${FIX_TYPE}" in
     rc-fix|rc-inhibit)
         LRB=$(get_last_rc_branch prod)
 
-        [ ! ${LRB} ] && echo "Cannot finish '${FIX}' since there is no rc-branch ongoing!!!" && exit 1
-
         if [ "${FIX_TYPE}" == "rc-fix" ]; then
             set_TARGET ${LRB} ${TRUNK}
         elif [ "${FIX_TYPE}" == "rc-inhibit" ]; then
+        	[ ! ${LRB} ] && echo "Cannot finish '${FIX}' since there is no rc-branch ongoing!!!" && exit 1
             set_TARGET ${LRB} finish
         fi ;;
     *) echo "This type of fix '${FIX_TYPE}' is not supported!" && exit 1
@@ -99,6 +98,27 @@ merge_to_target() {
         || exit 1
 }
 
+handle_broken_push(){
+	echo "::handle_broken_push"
+    TARGET=$1
+    FIX=$2
+	NOTES=$3
+	UPSTREAM_OBJECT=$4
+	echo "git push -f origin ${FIX} --no-verify"
+	git push -f origin ${FIX} --no-verify && \
+    echo "overwrite_and_push_notes \"err_push,${TARGET},${NOTES}\" ${UPSTREAM_OBJECT}" && \
+	overwrite_and_push_notes "err_push,${TARGET},${NOTES}" ${UPSTREAM_OBJECT}
+}
+
+handle_broken_rebase(){
+	echo "::handle_broken_rebase"
+    ONTO=$1
+    NOTES=$2
+    UPSTREAM_OBJECT=$3
+    echo "overwrite_and_push_notes \"err_rebase,${ONTO},${NOTES}\" ${UPSTREAM_OBJECT}"
+    overwrite_and_push_notes "err_rebase,${ONTO},${NOTES}" ${UPSTREAM_OBJECT}
+}
+
 push_and_merge() {
     TARGET=$1
     FIX=$2
@@ -111,7 +131,7 @@ push_and_merge() {
     # A push can return non zero status because of hooks. Is this scenery handled correctly?
     wait ${PUSH_PID} \
         && merge_to_target ${TARGET} ${FIX} ${NOTES} ${UPSTREAM_OBJECT} \
-        || overwrite_and_push_notes "err_push,${TARGET},${NOTES}" ${UPSTREAM_OBJECT}
+        || handle_broken_push ${TARGET} ${FIX} ${NOTES} ${UPSTREAM_OBJECT}
 }
 
 rebase_onto() {
@@ -133,7 +153,7 @@ rebase_onto() {
         # TODO Stress test a broken rebase!
 	    # A rebase can have conflicts that will cause the git rebase command
 	    # above to return non zero. Is this scenery handled correctly?
-    	overwrite_and_push_notes "err_rebase,${ONTO},${NOTES}" ${UPSTREAM_OBJECT}
+        handle_broken_rebase ${ONTO} ${NOTES} ${UPSTREAM_OBJECT}
 	fi
 }
 
@@ -202,13 +222,20 @@ elif [[ ${TARGET} == err_* ]]; then
     FUTURE_UPSTREAM_OBJECT=$(git rev-parse HEAD)
     case "${TARGET}" in
         err_rebase*)
+                echo "err_rebase*"
                 ONTO=$(get_onto_from_err ${TARGET})
+                echo "ONTO: $ONTO"
                 NOTES=$(get_notes_from_err ${TARGET})
+				echo "NOTES: $NOTES"
                 [ ! ${NOTES} ] && NOTES=$(git merge-base ${FIX} $(get_remote ${ONTO}))
+				echo "NOTES: $NOTES"
                 push_and_merge ${ONTO} ${FIX} ${NOTES} ${FUTURE_UPSTREAM_OBJECT} ;;
         err_push*)
+                echo "err_push*"
                 NOTES=$(get_notes_from_err ${TARGET})
                 PREV_TARGET=$(get_target_from_err ${TARGET})
+				echo "NOTES: $NOTES"
+				echo "PREV_TARGET: $PREV_TARGET"
                 push_and_merge ${PREV_TARGET} ${FIX} ${NOTES} ${FUTURE_UPSTREAM_OBJECT} ;;
     esac
 elif [ ${TARGET} == finish ]; then
