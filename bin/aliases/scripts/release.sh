@@ -24,20 +24,28 @@ if [ ! "${RELEASE_BRANCH}" ]; then
     echo "You must specify a remote branch where to release the current HEAD!" && exit 1
 fi
 
-if  [ ! "$(git branch --contains $(git rev-parse $(git upstream ${TRUNK})) $(git refname))" ]; then
-    echo "You must rebase this branch with '$(git upstream ${TRUNK})'"
-    echo "   (use \"git rebase -p $(git upstream ${TRUNK})\")\n"
-    echo "When ready, re-run this command"
+CUR_BRANCH=$(git refname)
+RC_BRANCH=$(get_last_rc_branch prod)
+
+if [ "${CUR_BRANCH}" == "${RC_BRANCH}" ]; then
+    check_upstream
+    do_push ${RELEASE_BRANCH}
 else
-    if [ ! "$(git cherry $(git upstream ${TRUNK}) $(get_remote ${RELEASE_BRANCH}))" ]; then
-        do_push ${RELEASE_BRANCH}
+    if  [ ! "$(git branch --contains $(git rev-parse $(git upstream ${TRUNK})) $(git refname))" ]; then
+        echo "You must rebase this branch with '$(git upstream ${TRUNK})'"
+        echo "   (use \"git rebase -p $(git upstream ${TRUNK})\")\n"
+        echo "When ready, re-run this command"
     else
-        echo "It seems that '$(get_remote ${RELEASE_BRANCH})' is not aligned with '$(git upstream ${TRUNK})'"
-        echo "You MUST FIX this before continue with the release, or\n"
-        echo "    IF YOU KNOW WHAT ARE DOING...\n"
-        echo "you can OVERWRITE '$(get_remote ${RELEASE_BRANCH})' with the current HEAD\n"
-        MSG="Are you sure to OVERWRITE '$(get_remote ${RELEASE_BRANCH})' with the current HEAD?"
-        MSG="\033[1;31m${MSG}\033[0m"
-        do_push ${RELEASE_BRANCH} "${MSG}"
+        if [ ! "$(git cherry $(git upstream ${TRUNK}) $(get_remote ${RELEASE_BRANCH}))" ]; then
+            do_push ${RELEASE_BRANCH}
+        else
+            echo "It seems that '$(get_remote ${RELEASE_BRANCH})' is not aligned with '$(git upstream ${TRUNK})'"
+            echo "You MUST FIX this before continue with the release, or\n"
+            echo "    IF YOU KNOW WHAT ARE DOING...\n"
+            echo "you can OVERWRITE '$(get_remote ${RELEASE_BRANCH})' with the current HEAD\n"
+            MSG="Are you sure to OVERWRITE '$(get_remote ${RELEASE_BRANCH})' with the current HEAD?"
+            MSG="\033[1;31m${MSG}\033[0m"
+            do_push ${RELEASE_BRANCH} "${MSG}"
+        fi
     fi
 fi
