@@ -14,7 +14,7 @@ check_upstream
 
 LRB=$(get_last_rc_branch)
 
-if [[ $(git cherry $(git lasttag ${PRT_PREFIX}) $(get_remote ${LRB})) ]]; then
+if [ "$(get_remote ${LRB})" ] && [ "$(git cherry $(git lasttag ${PRT_PREFIX}) $(get_remote ${LRB}))" ]; then
     # Check that the last rc-branch has some commits not yet released on the
     # last production tag. If that is the case...
     echo "There is already \"${LRB}\" ongoing"
@@ -33,10 +33,10 @@ else
         git tag ${NRT}
         # Push tag
         git push --no-verify origin ${NRT}
-        # Add notes to tag
-        git notes add -f -m "${FEATURES}" "${NRT}"
-        # Push notes
-        git push --no-verify origin refs/notes/commits
+        # Add notes to tag, if FEATURES not empty
+        [ "${FEATURES}" ] && git notes add -f -m "${FEATURES}" "${NRT}"
+        # Push notes, if FEATURES not empty
+        [ "${FEATURES}" ] && git push --no-verify origin refs/notes/commits
         # Create branch and check it out
         git checkout --no-track -b ${NRB} $(git upstream ${TRUNK})
         # Push branch

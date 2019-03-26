@@ -29,6 +29,8 @@ get_last_rc_branch() {
     RCT_PREFIX=rc
 
     LRT=$(git lasttag ${RCT_PREFIX})
+    [ ! ${LRT} ] && LRT="${RCT_PREFIX}-0"
+
     LRB=$(create_branch_from_tag ${LRT})
 
     if [ ${PRT_PREFIX} ]; then
