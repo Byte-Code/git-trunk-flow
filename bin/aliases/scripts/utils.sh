@@ -1,7 +1,12 @@
 get_remote() {
     BRANCH=$1
     [ ! ${BRANCH} ] && echo "You must provide the branch to check the remote for" && exit 1
-    echo "$(git for-each-ref --format="%(refname:lstrip=2)" "refs/remotes/*/${BRANCH}")"
+    REMOTE=$(git upstream ${BRANCH})
+    if [ ! ${REMOTE} ]; then
+        echo "$(git for-each-ref --format="%(refname:lstrip=2)" "refs/remotes/*/${BRANCH}")"
+    else
+        echo "${REMOTE}"
+    fi
 }
 
 create_branch_from_tag() {
