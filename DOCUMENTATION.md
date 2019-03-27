@@ -164,8 +164,16 @@ Per i branch di tipo rc-inhibit:
     git finish-rc-inhibit
     description:
     Bisognera' eseguire questo comando UNA volta:
-    1) Incorporare la fix sul rc-branch corrente (pull-request su rc-branch)
+    1) Serve per "incorporare" la fix sul rc-branch corrente (verra' creata una pull-request sul rc-branch corrente)
     N.B. Il comando va lanciato all'interno del rc-inhibit branch
+    per allineare l'ambiente di QA con le nuove modifiche e' necessario portarsi nel rc-branch corrente
+
+    git checkout $(git rc-branch)
+
+    e successivamente lanciare questo comando
+
+    git release release-qa
+
 
 Una volta che tutte le nuove feature ed i bugfix portati in QA, sono stati testati e laddove necessario effettuate le opportune fix,
 il rc-branch e' pronto per poter essere portato in produzione.
@@ -174,10 +182,16 @@ A tal proposito esiste un alias dedicato:
 ## git release-rc
 
     usage:
-    git release-rc (lanciato all'interno dell'ultimo rc-branch)
+    git release-rc (lanciato all'interno del rc-branch in corso)
     description:
     Inneschera' un rilascio in produzione pushando sul branch dedicato (release-prod) ed inoltre
     creera' un nuovo tag di produzione del tipo prod-v(CURRENT N+1)
+    N.B. Dato che Il comando va lanciato all'interno del rc-branch corrente e
+    possibile utilizzare il seguente comando per fare il checkout di tale branch
+
+    git checkout $(git rc-branch)
+
+
 
 # hc-branch-v\*
 
@@ -204,20 +218,39 @@ Git alias coinvolti:
     git finish-hotfix
     description:
     Bisognera' eseguire questo comando DUE o TRE volte dipendentemente dall'esistenza
-    o meno di un rc-branch in corso. La prima esecuzione e' identica in entrambi i casi
+    o meno di un rc-branch non ancora rilasciato. La prima esecuzione e' identica in entrambi i casi
     1) Incorporare la hotfix sul hc-branch corrente (pull-request su hc-branch)
 
     Nel caso, piu' semplice, di non esistenza di un rc-branch in corso
-    2a) Incorporare la hotfix su master immediatamente dopo che la pull-request al punto 1
+    2a) Incorporare la hotfix su master IMMEDIATAMENTE dopo che la pull-request al punto 1
     e' stata approvata e mergiata.
 
     Nel caso, piu' complesso, di esistenza di un rc-branch
-    2b) Incorporare la hotfix su rc-branch immediatamente dopo che la pull-request al punto 1
+    2b) Incorporare la hotfix su rc-branch IMMEDIATAMENTE dopo che la pull-request al punto 1
     e' stata approvata e mergiata.
-    3) Incorporare la hotfix su master immediatamente dopo che la pull-request al punto 2a
+    3) Incorporare la hotfix su master IMMEDIATAMENTE dopo che la pull-request al punto 2a
     e' stata approvata e mergiata.
 
-    N.B. Il comando va lanciato all'interno dell'hotfix branch
+    N.B.1. Il comando va lanciato all'interno dell'hotfix branch
+
+    N.B.2 Dopo che la pull request e' stata mergiata sul hc-branch corrente
+    per allineare l'ambiente di PREPROD con le nuove modifiche e' necessario portarsi nel hc-branch corrente
+
+    git checkout $(git hc-branch)
+
+    e successivamente lanciare questo comando
+
+    git release release-preprod
+
+    N.B.3 (Se nel caso 2b) Dopo che la pull request e' stata mergiata sul rc-branch corrente
+    per allineare l'ambiente di QA con le nuove modifiche e' necessario portarsi nel rc-branch corrente
+
+    git checkout $(git rc-branch)
+
+    e successivamente lanciare questo comando
+
+    git release release-qa
+
 
 ## git release-hc
 
@@ -226,6 +259,10 @@ Git alias coinvolti:
     description:
     Cosi' come per l'rc-branch anche l'hc-branch ha un comando dedicato per innescare un rilascio
     in produzione sul branch dedicato. Anche in questo caso verra' creato un nuovo tag di produzione.
+    N.B. Dato che Il comando va lanciato all'interno del hc-branch corrente e
+    possibile utilizzare il seguente comando per fare il checkout di tale branch
+
+    git checkout $(git hc-branch)
 
 
 
