@@ -122,23 +122,32 @@ Git alias coinvolti:
 
 Per i branch di tipo rc-fix:
 
-**git create-rc-fix**:
+**git create-rc-fix**
 
     usage:
     git create-rc-fix <fb-branch|TP>
     description:
     E' il comando che permette di creare un nuovo rc-fix branch
 
-**git finish-rc-fix**:
+**git finish-rc-fix**
 
     usage:
     git finish-rc-fix
     description:
     Bisognera' eseguire questo comando DUE volte:
-    1) Incorporare la fix sul rc-branch corrente (pull-request su rc-branch)
-    2) Incorporare la fix su master immediatamente dopo che la pull-request al punto 1
-    e' stata approvata e mergiata.
-    N.B. Il comando va lanciato all'interno del rc-fix branch
+    1) Serve per "incorporare" la fix sul rc-branch corrente (verra' creata una pull-request sul rc-branch corrente)
+    2) Serve per "incorporare" la fix su master, va eseguito IMMEDIATAMENTE dopo che la pull-request al punto 1
+    e' stata approvata e mergiata, inoltre la seconda pull-request va approvata SEMPRE, eventuali change request vanno
+    comunicate nella pull-request sul rc-branch.
+    N.B.1 Il comando va lanciato all'interno del rc-fix branch
+    N.B.2 Dopo che la pull request e' stata mergiata sul rc-branch corrente
+    per allineare l'ambiente di QA con le nuove modifiche e' necessario portarsi nel rc-branch corrente
+
+    git checkout $(git rc-branch)
+
+    e successivamente lanciare questo comando
+
+    git release release-qa
 
 Per i branch di tipo rc-inhibit:
 
@@ -170,7 +179,7 @@ A tal proposito esiste un alias dedicato:
     Inneschera' un rilascio in produzione pushando sul branch dedicato (release-prod) ed inoltre
     creera' un nuovo tag di produzione del tipo prod-v(CURRENT N+1)
 
-# hc-branch-v\*:
+# hc-branch-v\*
 
 Branch che viene automaticamente creato quando si rende necessario effettuare una hotfix.
 
