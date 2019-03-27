@@ -26,8 +26,12 @@ fi
 
 CUR_BRANCH=$(git refname)
 RC_BRANCH=$(get_last_rc_branch prod)
+HC_BRANCH=$(get_last_hc_branch prod)
 
 if [ "${CUR_BRANCH}" == "${RC_BRANCH}" ]; then
+    check_upstream
+    do_push ${RELEASE_BRANCH}
+elif [ "${CUR_BRANCH}" == "${HC_BRANCH}" ]; then
     check_upstream
     do_push ${RELEASE_BRANCH}
 else
