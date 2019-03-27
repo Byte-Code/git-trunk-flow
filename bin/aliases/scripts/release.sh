@@ -32,9 +32,12 @@ if [ "${CUR_BRANCH}" == "${RC_BRANCH}" ]; then
     do_push ${RELEASE_BRANCH}
 else
     if  [ ! "$(git branch --contains $(git rev-parse $(git upstream ${TRUNK})) $(git refname))" ]; then
-        echo "You must rebase this branch with '$(git upstream ${TRUNK})'"
-        echo "   (use \"git rebase -p $(git upstream ${TRUNK})\")\n"
-        echo "When ready, re-run this command"
+        echo "You should rebase this branch with '$(git upstream ${TRUNK})'"
+        echo "   git rebase -p $(git upstream ${TRUNK})\n"
+        echo "or...\n"
+        echo "if you are brave enough, can run this command"
+        echo "   git push -f origin HEAD:${RELEASE_BRANCH} --no-verify\n"
+        echo "OVERWRITING the current '${RELEASE_BRANCH}'"
     else
         if [ ! "$(git cherry $(git upstream ${TRUNK}) $(get_remote ${RELEASE_BRANCH}))" ]; then
             do_push ${RELEASE_BRANCH}
