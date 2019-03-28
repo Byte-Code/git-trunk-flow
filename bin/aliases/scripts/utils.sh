@@ -1,7 +1,7 @@
 get_remote() {
     BRANCH=$1
     [ ! ${BRANCH} ] && echo "You must provide the branch to check the remote for" && exit 1
-    REMOTE=$(git upstream ${BRANCH})
+    REMOTE=$(git upstream ${BRANCH} 2>/dev/null)
     if [ ! ${REMOTE} ]; then
         echo "$(git for-each-ref --format="%(refname:lstrip=2)" "refs/remotes/*/${BRANCH}")"
     else
@@ -193,8 +193,8 @@ check_upstream() {
 handle_finish() {
     TARGET=$1
     TOPIC=$2
-#    if [ $(git branch --list --remote --contains $(git rev-parse HEAD) $(git upstream ${TARGET})) ]; then
-    if [ $(git branch --list --remote --contains $(git rev-parse HEAD) $(get_remote ${TARGET})) ]; then
+    # Check that the remote of TOPIC is fully contained into the remote of TARGET
+    if [ $(git branch --list --remote --contains $(git rev-parse $(get_remote ${TOPIC})) $(get_remote ${TARGET})) ]; then
         echo "Good news :) '${TOPIC}' has been merged into '${TARGET}'"
         echo "Since now '${TOPIC}' branch is useless, you have a chance to do some cleaning."
         echo "Do you want to delete this branch and its upstream?"

@@ -15,6 +15,7 @@ set_TARGET() {
         echo "error: The current branch '$(git refname)' doesn't have commits yet" && exit 1
     else
         UPSTREAM_NOTES=$(get_notes ${FIX_ORIGIN})
+		echo "UPSTREAM_NOTES: $UPSTREAM_NOTES"
         if [ ${UPSTREAM_NOTES} ]; then
             [ ${UPSTREAM_NOTES} ] && [[ ${UPSTREAM_NOTES} == finish ]] && TARGET=finish
             [ ${UPSTREAM_NOTES} ] && [[ ${UPSTREAM_NOTES} == err_* ]] && TARGET=${UPSTREAM_NOTES}
@@ -58,20 +59,21 @@ case "${FIX_TYPE}" in
     rc-inhibit) [[ ${FIX} != *#* ]] && echo "The current branch doesn't seem to be a 'rc-inhibit' branch" && exit 1;;
 esac
 
-check_upstream ${FIX}
-
 case "${FIX_TYPE}" in
     hc-fix|hc-inhibit)
         LHB=$(get_last_hc_branch prod)
-
-        [ ! ${LHB} ] && echo "Cannot finish '${FIX}' since there is no hc-branch ongoing!!!" && exit 1
 
         if [ "${FIX_TYPE}" == "hc-fix" ]; then
             LRB=$(get_last_rc_branch prod)
             # If there is a rc-branch ongoing LRB should be not empty
             # otherwise TRUNK will take its place
             set_TARGET ${LHB} ${LRB} ${TRUNK}
+            # We need to check the upstream only the first time
+            # TODO check better if this is correct. If happens a conflict resolution in the second run?
+            [ "${TARGET}" == "${LHB}" ] && check_upstream ${FIX}
         elif [ "${FIX_TYPE}" == "hc-inhibit" ]; then
+        	[ ! ${LHB} ] && echo "Cannot finish '${FIX}' since there is no hc-branch ongoing!!!" && exit 1
+            check_upstream ${FIX}
             set_TARGET ${LHB} finish
         fi ;;
     rc-fix|rc-inhibit)
@@ -79,8 +81,12 @@ case "${FIX_TYPE}" in
 
         if [ "${FIX_TYPE}" == "rc-fix" ]; then
             set_TARGET ${LRB} ${TRUNK}
+            # We need to check the upstream only the first time
+            # TODO check better if this is correct. If happens a conflict resolution in the second run?
+            [ "${TARGET}" == "${LRB}" ] && check_upstream ${FIX}
         elif [ "${FIX_TYPE}" == "rc-inhibit" ]; then
         	[ ! ${LRB} ] && echo "Cannot finish '${FIX}' since there is no rc-branch ongoing!!!" && exit 1
+            check_upstream ${FIX}
             set_TARGET ${LRB} finish
         fi ;;
     *) echo "This type of fix '${FIX_TYPE}' is not supported!" && exit 1
