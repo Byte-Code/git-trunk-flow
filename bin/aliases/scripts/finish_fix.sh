@@ -97,11 +97,18 @@ merge_to_target() {
     COMPARE=${2}
     NOTES=${3}
     OBJECT=${4}
+#    echo "merge_to_target::"
+#    echo "BASE ${BASE}"
+#    echo "COMPARE ${COMPARE}"
+#    echo "NOTES ${NOTES}"
+#    echo "OBJECT ${OBJECT}"
     echo "git pull-request ${BASE} ${COMPARE}"
+#    exit
     git pull-request ${BASE} ${COMPARE} & PR_PID=$!
     wait ${PR_PID} \
         && overwrite_and_push_notes ${NOTES} ${OBJECT} \
         || exit 1
+#    echo "::merge_to_target"
 }
 
 handle_broken_push(){

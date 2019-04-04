@@ -49,8 +49,8 @@ get_repo_name() {
 }
 
 NO_MERGEABLE_MSG=
-NO_MERGEABLE_MSG="${NO_MERGEABLE_MSG}Cannot create a pull request for a branch not mergeable with '$(git upstream ${BASE_BRANCH})'.\n\n"
-NO_MERGEABLE_MSG="${NO_MERGEABLE_MSG} (use \"git fetch -tp && git rebase $(git upstream ${BASE_BRANCH}))\" to update your local branch)"
+NO_MERGEABLE_MSG="${NO_MERGEABLE_MSG}Cannot create a pull request for a branch not mergeable with '$(get_remote ${BASE_BRANCH})'.\n\n"
+NO_MERGEABLE_MSG="${NO_MERGEABLE_MSG} (use \"git fetch -tp && git rebase $(get_remote ${BASE_BRANCH}))\" to update your local branch)"
 
 IS_MERGEABLE=$(is_mergeable ${BASE_BRANCH} ${COMPARE_BRANCH})
 [[ ! ${IS_MERGEABLE} ]] && echo "${NO_MERGEABLE_MSG}" && exit 1
@@ -60,7 +60,7 @@ NO_UPSTREAM_MSG="${NO_UPSTREAM_MSG}Cannot create a pull request for a branch wit
 NO_UPSTREAM_MSG="${NO_UPSTREAM_MSG}To push the current branch and set the remote as upstream\n\n"
 NO_UPSTREAM_MSG="${NO_UPSTREAM_MSG} (use \"git push --set-upstream origin ${COMPARE_BRANCH})"
 
-COMPARE_BRANCH_UPSTREAM=$(git upstream ${COMPARE_BRANCH})
+COMPARE_BRANCH_UPSTREAM=$(get_remote ${COMPARE_BRANCH})
 [[ ! ${COMPARE_BRANCH_UPSTREAM} ]] && echo "${NO_UPSTREAM_MSG}" && exit 1
 
 GITHUB_USER=$(get_repo_user)

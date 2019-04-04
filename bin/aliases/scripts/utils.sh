@@ -150,7 +150,7 @@ get_features_inhibit() {
 is_mergeable() {
 	BASE_BRANCH=$1
 	COMPARE_BRANCH=$2
-	echo $(git branch --contains $(git upstream ${BASE_BRANCH}) ${COMPARE_BRANCH})
+	echo $(git branch --contains $(get_remote ${BASE_BRANCH}) ${COMPARE_BRANCH})
 }
 
 check_upstream() {
