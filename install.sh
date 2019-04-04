@@ -1,4 +1,4 @@
-VERSION=v0.13.1
+VERSION=v0.13.2
 CUR_VERSION=$(git trunk 2>/dev/null)
 DEST=trunk-flow
 
