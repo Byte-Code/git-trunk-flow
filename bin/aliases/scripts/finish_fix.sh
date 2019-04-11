@@ -245,11 +245,13 @@ elif [[ ${TARGET} == err_* ]]; then
                 push_and_merge ${ONTO} ${FIX} ${NOTES} ${FUTURE_UPSTREAM_OBJECT} ;;
         err_push*)
                 echo "err_push*"
-                NOTES=$(get_notes_from_err ${TARGET})
-                PREV_TARGET=$(get_target_from_err ${TARGET})
-				echo "NOTES: $NOTES"
-				echo "PREV_TARGET: $PREV_TARGET"
-                push_and_merge ${PREV_TARGET} ${FIX} ${NOTES} ${FUTURE_UPSTREAM_OBJECT} ;;
+                FUTURE_NOTES=$(get_notes_from_err ${TARGET})
+                FUTURE_TARGET=$(get_target_from_err ${TARGET})
+				echo "FUTURE_TARGET: ${FUTURE_TARGET}"
+				echo "FUTURE_NOTES: ${FUTURE_NOTES}"
+                echo "FUTURE_UPSTREAM_OBJECT: ${FUTURE_UPSTREAM_OBJECT}"
+                echo "push_and_merge ${FUTURE_TARGET} ${FIX} ${FUTURE_NOTES} ${FUTURE_UPSTREAM_OBJECT}"
+                push_and_merge ${FUTURE_TARGET} ${FIX} ${FUTURE_NOTES} ${FUTURE_UPSTREAM_OBJECT} ;;
     esac
 elif [ ${TARGET} == finish ]; then
     case "${FIX_TYPE}" in

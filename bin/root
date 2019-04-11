@@ -3,6 +3,8 @@
 
 [alias]
     # cross
+    notes-overwrite-and-push = "!. $PWD/trunk-flow/aliases/scripts/utils.sh; overwrite_and_push_notes"
+
     release = "!. $PWD/trunk-flow/aliases/scripts/release.sh"
     hc-branch = "!. $PWD/trunk-flow/aliases/scripts/hc-branch.sh"
     rc-branch = "!. $PWD/trunk-flow/aliases/scripts/rc-branch.sh"

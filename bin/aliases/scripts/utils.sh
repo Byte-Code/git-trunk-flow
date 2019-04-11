@@ -85,6 +85,7 @@ fetch_notes() {
 }
 
 push_notes() {
+    echo "git push origin refs/notes/commits --no-verify"
     git push origin refs/notes/commits --no-verify
 }
 
@@ -96,11 +97,12 @@ get_notes() {
 overwrite_notes() {
     NOTES=$1
     OBJECT=$2
+    echo "git notes add -f -m ${NOTES} ${OBJECT}"
     git notes add -f -m ${NOTES} ${OBJECT}
 }
 
 overwrite_and_push_notes() {
-    overwrite_notes "$@"
+    overwrite_notes $@
     push_notes
 }
 
