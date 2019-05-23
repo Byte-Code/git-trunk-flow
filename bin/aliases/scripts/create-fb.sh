@@ -1,9 +1,9 @@
+. $PWD/trunk-flow/aliases/scripts/utils.sh
+
 # Create a new feature branch, branching off from trunk branch (origin/master)
 # Delegate the pushing to remote when the feature is finished using the finish-fb.sh script
 
 TRUNK=master
-
-git fetch
 
 usage() {
     echo "error: git create-fb <docs|chore|test|refactor|feature|bugfix>/<TP_ID|desc>"
@@ -20,7 +20,9 @@ case "${1}" in
     *) usage && exit 1;;
 esac
 
-FB="${1}"
+fetch_all
+
+FB=${1}
 
 # The --no-track allow us to not set $(git upstream ${TRUNK}) as the remote for this branch
 git checkout --no-track -b ${FB} $(git upstream ${TRUNK})

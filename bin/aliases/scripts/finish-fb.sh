@@ -30,8 +30,7 @@ fetch_all
 set_TARGET
 check_upstream ${FB}
 
-UPSTREAM_OBJECT=$(git rev-parse $(git upstream ${FB}))
-
+UPSTREAM_OBJECT=$(git rev-parse $(get_remote ${FB}))
 if [ ${TRUNK} == ${TARGET} ]; then
     git pull-request ${TRUNK} ${FB} & PULL_REQUEST_PID=$!
     wait ${PULL_REQUEST_PID} \
