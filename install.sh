@@ -11,6 +11,7 @@ install() {
     DEST=$1
     upgrade ${DEST}
     INCLUDE=$(cat << EOF
+
 [include]
     path = "../${DEST}/root"
 EOF)
