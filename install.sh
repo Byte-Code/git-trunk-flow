@@ -1,4 +1,4 @@
-VERSION=v0.14.1
+VERSION=v0.15.0
 CUR_VERSION=$(git trunk 2>/dev/null)
 DEST=trunk-flow
 
@@ -11,7 +11,6 @@ install() {
     DEST=$1
     upgrade ${DEST}
     INCLUDE=$(cat << EOF
-
 [include]
     path = "../${DEST}/root"
 EOF)
