@@ -32,6 +32,7 @@
 
     pull-request = "!. $PWD/trunk-flow/aliases/scripts/pull_request.sh"
 
+    finish = "!. $PWD/trunk-flow/aliases/scripts/finish.sh"
 
 
 
