@@ -9,4 +9,5 @@ case "${FIX}" in
     *) CMD="git finish-fb" ;;
 esac
 
-echo "$CMD" && ${CMD}
+echo "$CMD"
+${CMD}

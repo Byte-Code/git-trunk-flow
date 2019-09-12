@@ -20,6 +20,15 @@ do_push(){
     esac
 }
 
+do_overwrite(){
+    RELEASE_BRANCH=$1
+    echo "IF YOU KNOW WHAT ARE DOING...\n"
+    echo "you can OVERWRITE '$(get_remote ${RELEASE_BRANCH})' with the current HEAD\n"
+    MSG="Are you sure to OVERWRITE '$(get_remote ${RELEASE_BRANCH})' with the current HEAD?"
+    MSG="\033[1;31m${MSG}\033[0m"
+    do_push ${RELEASE_BRANCH} "${MSG}"
+}
+
 if [ ! "${RELEASE_BRANCH}" ]; then
     echo "You must specify a remote branch where to release the current HEAD!" && exit 1
 fi
@@ -36,23 +45,16 @@ elif [ "${CUR_BRANCH}" == "${HC_BRANCH}" ]; then
     do_push ${RELEASE_BRANCH}
 else
     if  [ ! "$(git branch --contains $(git rev-parse $(git upstream ${TRUNK})) $(git refname))" ]; then
-        echo "You should rebase this branch with '$(git upstream ${TRUNK})'"
-        echo "   git rebase -p $(git upstream ${TRUNK})\n"
-        echo "or...\n"
-        echo "if you are brave enough, can run this command"
-        echo "   git push -f origin HEAD:${RELEASE_BRANCH} --no-verify\n"
-        echo "OVERWRITING the current '${RELEASE_BRANCH}'"
+        echo "You should rebase this branch with '$(git upstream ${TRUNK})'\n"
+        echo "  (git rebase -p $(git upstream ${TRUNK})), or...\n"
+        do_overwrite ${RELEASE_BRANCH}
     else
         if [ ! "$(git cherry $(git upstream ${TRUNK}) $(get_remote ${RELEASE_BRANCH}))" ]; then
             do_push ${RELEASE_BRANCH}
         else
             echo "It seems that '$(get_remote ${RELEASE_BRANCH})' is not aligned with '$(git upstream ${TRUNK})'"
-            echo "You MUST FIX this before continue with the release, or\n"
-            echo "    IF YOU KNOW WHAT ARE DOING...\n"
-            echo "you can OVERWRITE '$(get_remote ${RELEASE_BRANCH})' with the current HEAD\n"
-            MSG="Are you sure to OVERWRITE '$(get_remote ${RELEASE_BRANCH})' with the current HEAD?"
-            MSG="\033[1;31m${MSG}\033[0m"
-            do_push ${RELEASE_BRANCH} "${MSG}"
+            echo "You MUST FIX this before continue with the release, or...\n"
+            do_overwrite ${RELEASE_BRANCH}
         fi
     fi
 fi

@@ -6,6 +6,7 @@
     notes-overwrite-and-push = "!. $PWD/trunk-flow/aliases/scripts/utils.sh; overwrite_and_push_notes"
 
     release = "!. $PWD/trunk-flow/aliases/scripts/release.sh"
+    release-prod = "!. $PWD/trunk-flow/aliases/scripts/_release-prod_.sh"
     hc-branch = "!. $PWD/trunk-flow/aliases/scripts/hc-branch.sh"
     rc-branch = "!. $PWD/trunk-flow/aliases/scripts/rc-branch.sh"
 
