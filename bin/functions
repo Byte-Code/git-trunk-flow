@@ -12,7 +12,7 @@ prevtag = "!f() {\
 
 nexttag = "!f() {\
     env=${1};\
-    cur_version=$(git lasttag ${env} | awk -F '-v' '{print $NF}');\
+    [ ${2} ] && cur_version=${2} || cur_version=$(git lasttag ${env} | awk -F '-v' '{print $NF}');\
     next_version=$(($cur_version+1));\
     next_tag=${env}-v${next_version};\
     echo ${next_tag};\

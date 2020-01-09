@@ -23,6 +23,23 @@ create_branch_from_tag() {
     echo "${BRANCH_PREFIX}-${TAG_VERSION}"
 }
 
+get_next_rc_tag() {
+    RCT_PREFIX=rc
+    git fetch -tp
+
+    NRT=$(git nexttag ${RCT_PREFIX})
+    NRB=$(create_branch_from_tag ${NRT})
+
+    while [[ $(git for-each-ref --format="%(refname:lstrip=2)" "refs/remotes/*/${NRB}") ]]
+    do
+        cur_version=$(echo ${NRT} | awk -F '-v' '{print $NF}')
+        NRT=$(git nexttag ${RCT_PREFIX} ${cur_version})
+        NRB=$(create_branch_from_tag ${NRT})
+    done
+
+    echo "${NRT}"
+}
+
 get_last_rc_branch() {
     # Passing the production tag prefix (PRT_PREFIX) we want to know
     # the last rc-branch only if not already released.

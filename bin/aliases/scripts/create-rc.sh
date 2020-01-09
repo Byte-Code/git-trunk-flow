@@ -25,7 +25,7 @@ else
     if [ "$(git cherry $(git lasttag ${PRT_PREFIX}) $(get_remote ${TRUNK}))" ]; then
         fetch_notes
         FEATURE_INHIBIT=$(get_features_inhibit $(git list-fb script))
-        NRT=$(git nexttag ${RCT_PREFIX})
+        NRT=$(get_next_rc_tag)
         NRB=$(create_branch_from_tag ${NRT})
 
         FEATURES=$(git list-fb create ${FEATURE_INHIBIT})
