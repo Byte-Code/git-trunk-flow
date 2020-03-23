@@ -22,7 +22,7 @@ EOF)
 }
 
 if [ ! ${CUR_VERSION} ] || [ ${CUR_VERSION} != ${VERSION} ]; then
-    if [ ! ${CUR_VERSION} ]; then
+    if [ ! ${CUR_VERSION} ] || [ ${CUR_VERSION} == 'v0.0.0' ]; then
         echo "git-trunk-flow: installing ${VERSION}"
         install ${DEST}
     else
